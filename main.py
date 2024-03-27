@@ -2,69 +2,69 @@
 """Main script to filter an ICS file based on the groups in the description."""
 import os
 import logging
+import time
+
 from icalendar import Calendar
 import requests
 
-# Configuration du logger, avec niveau INFO, temps et message
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logging.info("Starting script")
+if __name__ == "__main__":
 
-# URL de l'ICS
-DEFAULT_URL = "https://cocktail.insa-rouen.fr/ics/edt-ade/2023-ITI3"
-URL = os.getenv("ICS_URL", DEFAULT_URL)
+    # Configuration du logger, avec niveau INFO, temps et message
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.info("Starting script")
 
-# Récupération du fichier ICS
-response = requests.get(URL)
-cal = Calendar.from_ical(response.text)
+    # URL de l'ICS
+    ICS_URL = os.getenv("ICS_URL", "https://cocktail.insa-rouen.fr/ics/edt-ade/2023-ITI3")
+    GROUPS = os.getenv("GROUPS", "ITI3").split(",")
+    EXTRA_CLASSES = os.getenv("EXTRA_COURSES", "").split(",")
+    REFRESH_INTERVAL = int(os.getenv("REFRESH_INTERVAL", 5 * 60))
 
-# Configuration des groupes, classes à garder
-DEFAULT_GROUPS = ("ITI32-APS-TD-02,ITI32-TD-02,ITI-32-PROGAV-TD-01,ITI32-TP2-1,"
-                  "ITI32-ESPAGNOL-RN-TD-01,ITI32-ANG-PG-TD-04")
-groupes_voulus = os.getenv("GROUPS", DEFAULT_GROUPS).split(",")
+    logging.info(f"URL: {ICS_URL}")
+    logging.info(f"Selected groups: {GROUPS}")
+    logging.info(f"Extra classes: {EXTRA_CLASSES}")
 
-extra_classes = os.getenv("EXTRA_COURSES", "").split(",")
+    while True:
+        response = requests.get(ICS_URL)
+        cal = Calendar.from_ical(response.text)
 
-logging.info(f"URL: {URL}")
-logging.info(f"Selected groups: {groupes_voulus}")
-logging.info(f"Extra classes: {extra_classes}")
+        for component in cal.walk():
+            # supprimer les événements qui n'ont pas un des groupes voulus dans leur description
+            desc = component.get('description')
+            if desc is None:
+                continue
+            desc_lines = desc.split('\n')
 
-for component in cal.walk():
-    # supprimer les événements qui n'ont pas un des groupes voulus dans leur description
-    desc = component.get('description')
-    if desc is None:
-        continue
-    lines = desc.split('\n')
+            GROUPE_VOULU = any(line in GROUPS for line in desc_lines)
 
-    A_GROUPE_VOULU = any(line in groupes_voulus for line in lines)
+            if not GROUPE_VOULU and component['summary'] not in EXTRA_CLASSES:
+                cal.subcomponents.remove(component)
 
-    if not A_GROUPE_VOULU and component['summary'] not in extra_classes:
-        cal.subcomponents.remove(component)
-
-    else:
-        event = component.get('summary')
-        parts = event.split("-")
-
-        if parts[0] == "H":
-            selected_parts = f"{parts[-2]}: {parts[2]}"
-        elif "PAO" in parts:
-            pao_index = parts.index("PAO")
-            selected_parts = f"{parts[pao_index + 2]}: {' '.join(parts[pao_index:pao_index + 2])}"
-        elif "examens" in lines:
-            if "Machine" == parts[-1]:
-                selected_parts = f"Exam: {parts[1]} Machine"
             else:
-                selected_parts = f"Exam: {parts[1]}"
-        elif len(parts) > 2:
-            selected_parts = f"{parts[2]}: {parts[1]}"
-        else:
-            logging.warning(f"{event} not matching any pattern, keeping as is.")
-            selected_parts = event
+                event_name = component.get('summary')
+                event_name_splitted = event_name.split("-")
 
-        component['summary'] = selected_parts
+                if event_name_splitted[0] == "H":
+                    new_event_name = f"{event_name_splitted[-2]}: {event_name_splitted[2]}"
+                elif "PAO" in event_name_splitted:
+                    pao_index = event_name_splitted.index("PAO")
+                    new_event_name = f"{event_name_splitted[pao_index + 2]}: {' '.join(event_name_splitted[pao_index:pao_index + 2])}"
+                elif "examens" in desc_lines:
+                    if "Machine" == event_name_splitted[-1]:
+                        new_event_name = f"Exam: {event_name_splitted[1]} Machine"
+                    else:
+                        new_event_name = f"Exam: {event_name_splitted[1]}"
+                elif len(event_name_splitted) > 2:
+                    new_event_name = f"{event_name_splitted[2]}: {event_name_splitted[1]}"
+                else:
+                    logging.warning(f"{event_name} not matching any pattern, keeping as is.")
+                    new_event_name = event_name
 
-# Génération du nouveau fichier ICS
-new_ical = cal.to_ical()
-with open("calendrier.ics", "wb") as f:
-    f.write(new_ical)
+                component['summary'] = new_event_name
 
-logging.info("ics file generated successfully")
+        # Génération du nouveau fichier ICS
+        new_ical = cal.to_ical()
+        with open("/var/www/html/calendrier.ics", "wb") as f:
+            f.write(new_ical)
+
+        logging.info("ics file generated successfully")
+        time.sleep(REFRESH_INTERVAL)
