@@ -61,6 +61,13 @@ if __name__ == "__main__":
 
                 component['summary'] = new_event_name
 
+                desc_lines = component['description'].split('\n')
+                desc_lines.pop(0)
+                desc_lines.pop(0)
+                desc_lines.pop(-2)
+                component['description'] = "\n".join(desc_lines)
+
+
         # Génération du nouveau fichier ICS
         new_ical = cal.to_ical()
         with open("/var/www/html/calendrier.ics", "wb") as f:
