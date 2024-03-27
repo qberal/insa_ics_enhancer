@@ -7,7 +7,7 @@ import requests
 
 # URL de votre fichier ICS
 default_url = "https://cocktail.insa-rouen.fr/ics/edt-ade/2023-ITI3"
-url = os.getenv("URL_ICS", default_url)
+url = os.getenv("ICS_URL", default_url)
 
 # Récupération du fichier ICS
 response = requests.get(url)
