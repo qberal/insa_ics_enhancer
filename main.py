@@ -1,28 +1,30 @@
 #!/usr/bin/env python3
-
+"""Main script to filter an ICS file based on the groups in the description."""
 import os
+import logging
 from icalendar import Calendar
 import requests
-import logging
 
 # Configuration du logger, avec niveau INFO, temps et message
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logging.info("Starting script")
 
-# URL de votre fichier ICS
-default_url = "https://cocktail.insa-rouen.fr/ics/edt-ade/2023-ITI3"
-url = os.getenv("ICS_URL", default_url)
+# URL de l'ICS
+DEFAULT_URL = "https://cocktail.insa-rouen.fr/ics/edt-ade/2023-ITI3"
+URL = os.getenv("ICS_URL", DEFAULT_URL)
 
 # Récupération du fichier ICS
-response = requests.get(url)
+response = requests.get(URL)
 cal = Calendar.from_ical(response.text)
 
-default_groups = ("ITI32-APS-TD-02,ITI32-TD-02,ITI-32-PROGAV-TD-01,ITI32-TP2-1,ITI32-ESPAGNOL-RN-TD-01,"
-                  "ITI32-ANG-PG-TD-04")
-groupes_voulus = os.getenv("GROUPS", default_groups).split(",")
+# Configuration des groupes, classes à garder
+DEFAULT_GROUPS = ("ITI32-APS-TD-02,ITI32-TD-02,ITI-32-PROGAV-TD-01,ITI32-TP2-1,"
+                  "ITI32-ESPAGNOL-RN-TD-01,ITI32-ANG-PG-TD-04")
+groupes_voulus = os.getenv("GROUPS", DEFAULT_GROUPS).split(",")
+
 extra_classes = os.getenv("EXTRA_COURSES", "").split(",")
 
-logging.info(f"URL: {url}")
+logging.info(f"URL: {URL}")
 logging.info(f"Selected groups: {groupes_voulus}")
 logging.info(f"Extra classes: {extra_classes}")
 
@@ -33,14 +35,9 @@ for component in cal.walk():
         continue
     lines = desc.split('\n')
 
-    a_groupe_voulu = False
+    A_GROUPE_VOULU = any(line in groupes_voulus for line in lines)
 
-    for line in lines:
-        if line in groupes_voulus:
-            a_groupe_voulu = True
-            break
-
-    if not a_groupe_voulu and component['summary'] not in extra_classes:
+    if not A_GROUPE_VOULU and component['summary'] not in extra_classes:
         cal.subcomponents.remove(component)
 
     else:
@@ -61,6 +58,7 @@ for component in cal.walk():
             selected_parts = event
 
         component['summary'] = selected_parts
+
 
 # Génération du nouveau fichier ICS
 new_ical = cal.to_ical()
