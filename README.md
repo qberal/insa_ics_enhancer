@@ -73,4 +73,4 @@ You can run the find_groups.py script to find available groups (note that you ne
 
 
 ## Usage
-You can access the schedule at http://localhost:3476/calendar.ics and subscribe to it in your favorite calendar app.
+You can access the schedule at http://localhost:3476/calendrier.ics and subscribe to it in your favorite calendar app.
