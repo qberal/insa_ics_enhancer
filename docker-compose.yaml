@@ -1,6 +1,6 @@
 services:
   insa_ics:
-    image: insa_ics:latest
+    image: ghcr.io/qberal/insa_ics:latest
     ports:
       - "8080:80"
     environment:
