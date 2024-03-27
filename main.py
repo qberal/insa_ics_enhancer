@@ -3,6 +3,11 @@
 import os
 from icalendar import Calendar
 import requests
+import logging
+
+# Configuration du logger, avec niveau INFO, temps et message
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.info("Starting script")
 
 # URL de votre fichier ICS
 default_url = "https://cocktail.insa-rouen.fr/ics/edt-ade/2023-ITI3"
@@ -12,8 +17,14 @@ url = os.getenv("ICS_URL", default_url)
 response = requests.get(url)
 cal = Calendar.from_ical(response.text)
 
-default_groups = "ITI32-APS-TD-02,ITI32-TD-02,ITI-32-PROGAV-TD-01,ITI32-TP2-1,ITI32-ESPAGNOL-RN-TD-01,ITI32-ANG-PG-TD-04"
+default_groups = ("ITI32-APS-TD-02,ITI32-TD-02,ITI-32-PROGAV-TD-01,ITI32-TP2-1,ITI32-ESPAGNOL-RN-TD-01,"
+                  "ITI32-ANG-PG-TD-04")
 groupes_voulus = os.getenv("GROUPS", default_groups).split(",")
+extra_classes = os.getenv("EXTRA_COURSES", "").split(",")
+
+logging.info(f"URL: {url}")
+logging.info(f"Selected groups: {groupes_voulus}")
+logging.info(f"Extra classes: {extra_classes}")
 
 for component in cal.walk():
     # supprimer les événements qui n'ont pas un des groupes voulus dans leur description
@@ -29,10 +40,9 @@ for component in cal.walk():
             a_groupe_voulu = True
             break
 
-    extra_classes = os.getenv("EXTRA_COURSES", "").split(",")
-
     if not a_groupe_voulu and component['summary'] not in extra_classes:
         cal.subcomponents.remove(component)
+
     else:
         event = component.get('summary')
         parts = event.split("-")
@@ -47,6 +57,7 @@ for component in cal.walk():
         elif len(parts) == 2 and "examens" in lines:
             selected_parts = f"Exam: {parts[1]}"
         else:
+            logging.warning(f"{event} not matching any pattern, keeping as is.")
             selected_parts = event
 
         component['summary'] = selected_parts
@@ -55,3 +66,5 @@ for component in cal.walk():
 new_ical = cal.to_ical()
 with open("calendrier.ics", "wb") as f:
     f.write(new_ical)
+
+logging.info("ics file generated successfully")
