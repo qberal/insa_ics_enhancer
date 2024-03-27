@@ -21,15 +21,21 @@ services:
     ports:
       - "3476:80"
     environment:
+      - TZ=Europe/Paris
       - ICS_URL=https://cocktail.insa-rouen.fr/ics/edt-ade/2023-ITI3
       - GROUPS=ITI32-APS-TD-02,ITI32-TD-02,ITI-32-PROGAV-TD-01,ITI32-TP2-1,ITI32-ESPAGNOL-RN-TD-01,ITI32-ANG-PG-TD-04
-      - EXTRA_COURSES=ITI32-PAO-PYTHON-TD-1
+      - EXTRA_COURSES=ITI32-PAO-PYTHON-TD-1,H-32-SME-CHORALE-ECAO-TD-1
+      - REFRESH_INTERVAL=300
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
 ```
 
 ### Service Configuration
-- `URL_ICS`: URL of the ICS feed to process
-- `GROUPES_VOULUS`: List of groups to display. separated by commas
+- `TZ`: Timezone of the calendar (for logs)
+- `ICS_URL`: URL of the ICS feed to process
+- `GROUPS`: List of groups to display. separated by commas
 - `EXTRA_COURSES`: List of names of courses to display, when not in specific groups. separated by commas
+- `REFRESH_INTERVAL`: Interval in seconds between each refresh of the ICS feed (in seconds)
 
 ### Choosing the Groups to Display
 You can run the find_groups.py script to find available groups (note that you need to change the URL in the script, or set `URL_ICS` as an environment variable).
