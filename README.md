@@ -20,7 +20,7 @@ services:
       - "3476:80"
     environment:
       - URL_ICS='https://cocktail.insa-rouen.fr/ics/edt-ade/2023-ITI3'
-      - DESIRED_GROUPS="ITI32-APS-TD-02,ITI32-TD-02,ITI-32-PROGAV-TD-01,ITI32-TP2-1,ITI32-ESPAGNOL-RN-TD-01,ITI32-ANG-PG-TD-04"
+      - GROUPES_VOULUS="ITI32-APS-TD-02,ITI32-TD-02,ITI-32-PROGAV-TD-01,ITI32-TP2-1,ITI32-ESPAGNOL-RN-TD-01,ITI32-ANG-PG-TD-04"
 ```
 ### Choosing the Groups to Display
 You can run the find_groups.py script to find available groups (note that you need to change the URL in the script, or set URL_ICS as an environment variable).
