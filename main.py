@@ -49,16 +49,18 @@ for component in cal.walk():
         elif "PAO" in parts:
             pao_index = parts.index("PAO")
             selected_parts = f"{parts[pao_index + 2]}: {' '.join(parts[pao_index:pao_index + 2])}"
+        elif "examens" in lines:
+            if "Machine" == parts[-1]:
+                selected_parts = f"Exam: {parts[1]} Machine"
+            else:
+                selected_parts = f"Exam: {parts[1]}"
         elif len(parts) > 2:
             selected_parts = f"{parts[2]}: {parts[1]}"
-        elif len(parts) == 2 and "examens" in lines:
-            selected_parts = f"Exam: {parts[1]}"
         else:
             logging.warning(f"{event} not matching any pattern, keeping as is.")
             selected_parts = event
 
         component['summary'] = selected_parts
-
 
 # Génération du nouveau fichier ICS
 new_ical = cal.to_ical()
