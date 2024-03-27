@@ -8,12 +8,11 @@ COPY main.py /root/script.py
 
 RUN chmod +x /root/script.py
 RUN echo "*/15 * * * * root python /root/script.py" > /etc/cron.d/cron_job
-RUN echo "*/15 * * * * root cp /root/calendrier.ics /var/www/html/calendrier.ics" > /etc/cron.d/cron_job
+RUN echo "*/15 * * * * root cp calendrier.ics /var/www/html/calendrier.ics" > /etc/cron.d/cron_job
 RUN chmod 0644 /etc/cron.d/cron_job
 RUN touch /var/log/cron.log
 RUN python /root/script.py
-
-COPY /root/calendrier.ics /var/www/html/calendrier.ics
+RUN cp /calendrier.ics /var/www/html/calendrier.ics
 
 EXPOSE 80
 
