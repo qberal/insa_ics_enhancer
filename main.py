@@ -19,6 +19,23 @@ if __name__ == "__main__":
     EXTRA_CLASSES = os.getenv("EXTRA_COURSES", "").split(",")
     REFRESH_INTERVAL = int(os.getenv("REFRESH_INTERVAL", 5 * 60))
 
+    REAL_NAME = {
+        "APS": "Sport",
+        "STAT": "Statistiques",
+        "PROGAV": "Programmation avancée",
+        "TSA": "Traitement de signaux aléatoires",
+        "CAPT": "Capteurs",
+        "DROIT": "Droit",
+        "ANG": "Anglais",
+        "TW1": "Technologies Web 1",
+        "PYTHON": "Python",
+        "ENT": "Entreprise et travail d'équipe",
+        "CMR": "Conférences métiers et recherche",
+        "COMPIL": "Compilation",
+        "AUTO": "Automatique",
+        "UMLDP": "UML et Design Patterns",
+    }
+
     logging.info(f"URL: {ICS_URL}")
     logging.info(f"Selected groups: {GROUPS}")
     logging.info(f"Extra classes: {EXTRA_CLASSES}")
@@ -44,17 +61,17 @@ if __name__ == "__main__":
                 event_name_splitted = event_name.split("-")
 
                 if event_name_splitted[0] == "H":
-                    new_event_name = f"{event_name_splitted[-2]}: {event_name_splitted[2]}"
+                    new_event_name = f"{event_name_splitted[-2]}: {REAL_NAME.get(event_name_splitted[2], event_name_splitted[2])}"
                 elif "PAO" in event_name_splitted:
                     pao_index = event_name_splitted.index("PAO")
-                    new_event_name = f"{event_name_splitted[pao_index + 2]}: {' '.join(event_name_splitted[pao_index:pao_index + 2])}"
+                    new_event_name = f"PAO: {REAL_NAME.get(event_name_splitted[pao_index + 1], event_name_splitted[pao_index + 1])}"
                 elif "examens" in desc_lines:
                     if "Machine" == event_name_splitted[-1]:
-                        new_event_name = f"Exam: {event_name_splitted[1]} Machine"
+                        new_event_name = f"Exam: {REAL_NAME.get(event_name_splitted[1], event_name_splitted[1])} Machine"
                     else:
-                        new_event_name = f"Exam: {event_name_splitted[1]}"
+                        new_event_name = f"Exam: {REAL_NAME.get(event_name_splitted[1], event_name_splitted[1])}"
                 elif len(event_name_splitted) > 2:
-                    new_event_name = f"{event_name_splitted[2]}: {event_name_splitted[1]}"
+                    new_event_name = f"{event_name_splitted[2]}: {REAL_NAME.get(event_name_splitted[1], event_name_splitted[1])}"
                 else:
                     logging.warning(f"{event_name} not matching any pattern, keeping as is.")
                     new_event_name = event_name
