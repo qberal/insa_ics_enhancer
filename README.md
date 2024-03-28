@@ -1,5 +1,7 @@
 # INSA ICS Enhancer
 
+![img_ical](https://github.com/qberal/insa_ics_enhancer/assets/38192283/8e976886-e433-46ee-b45a-28304177ab0e)
+
 Tired of having a not-so-good-schedule across your native calendar app?
 
 INSA ICS Enhancer is here for you!
