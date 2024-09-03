@@ -37,6 +37,14 @@ if __name__ == "__main__":
         "COMPIL": "Compilation",
         "AUTO": "Automatique",
         "UMLDP": "UML et Design Patterns",
+        "GSF2": "Gestion Stratégique et Financière 2",
+        "TI": "Traitement de l'Information",
+        "ML": "Machine Learning",
+        "RO": "Recherche Opérationnelle",
+        "BD2": "Base de Donnée 2",
+        "TIM": "Traitement de l'Image",
+        "RI": "Réseaux Informatiques",
+        "MGPI": "Maitrise des Grands Projets Informatiques"
     }
 
     logging.info(f"URL: {ICS_URL}")
