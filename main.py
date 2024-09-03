@@ -31,6 +31,7 @@ if __name__ == "__main__":
         "ALL": "Allemand",
         "FLE": "Français Langue Étrangère",
         "TW1": "Technologies Web 1",
+        "TW2": "Technologies Web 2",
         "PYTHON": "Python",
         "ENT": "Entreprise et travail d'équipe",
         "CMR": "Conférences métiers et recherche",
@@ -44,7 +45,8 @@ if __name__ == "__main__":
         "BD2": "Base de Donnée 2",
         "TIM": "Traitement de l'Image",
         "RI": "Réseaux Informatiques",
-        "MGPI": "Maitrise des Grands Projets Informatiques"
+        "MGPI": "Maitrise des Grands Projets Informatiques",
+        "CMR": "Conférences Métier Recherche"
     }
 
     logging.info(f"URL: {ICS_URL}")
