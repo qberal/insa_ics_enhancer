@@ -46,7 +46,6 @@ if __name__ == "__main__":
         "TIM": "Traitement de l'Image",
         "RI": "Réseaux Informatiques",
         "MGPI": "Maitrise des Grands Projets Informatiques",
-        "CMR": "Conférences Métier Recherche"
     }
 
     logging.info(f"URL: {ICS_URL}")
@@ -54,8 +53,14 @@ if __name__ == "__main__":
     logging.info(f"Extra classes: {EXTRA_CLASSES}")
 
     while True:
-        response = requests.get(ICS_URL)
-        cal = Calendar.from_ical(response.text)
+        try:
+            response = requests.get(ICS_URL)
+            response.raise_for_status()
+            cal = Calendar.from_ical(response.text)
+        except ValueError as e:
+            logging.error(f"{e}, retrying in 200 seconds")
+            time.sleep(200)
+            continue
 
         for component in cal.walk():
             # supprimer les événements qui n'ont pas un des groupes voulus dans leur description
@@ -96,7 +101,6 @@ if __name__ == "__main__":
                 desc_lines.pop(0)
                 desc_lines.pop(-2)
                 component['description'] = "\n".join(desc_lines)
-
 
         # Génération du nouveau fichier ICS
         new_ical = cal.to_ical()
