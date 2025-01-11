@@ -46,6 +46,11 @@ if __name__ == "__main__":
         "TIM": "Traitement de l'Image",
         "RI": "Réseaux Informatiques",
         "MGPI": "Maitrise des Grands Projets Informatiques",
+        "BGD": "Big Data",
+        "MANAG": "Management",
+        "DOC": "Document et Web Sémantique",
+        "RL": "Représentation Learning/Deep",
+        "SV": "Systèmes de Vision"
     }
 
     logging.info(f"URL: {ICS_URL}")
